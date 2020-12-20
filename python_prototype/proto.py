@@ -32,8 +32,8 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # return the resized image
     return resized
 
-prototxt = "resources/deploy.prototxt.txt"
-model = "resources/model.caffemodel" 
+prototxt = "../f-trak/static/deploy.prototxt.txt"
+model = "../f-trak/static/model.caffemodel" 
 min_confidence = 0.9
 
 # load our serialized model from disk
@@ -62,6 +62,7 @@ while True:
    net.setInput(blob)
    detections = net.forward()
 
+   print(detections.shape)
    # loop over the detections
    for i in range(0, detections.shape[2]):
       # extract the confidence (i.e., probability) associated with the prediction
