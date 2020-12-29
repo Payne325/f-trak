@@ -74,7 +74,7 @@ impl FaceCapture {
       let min_confidence = 0.9;
 
       //load model from disk
-      println!("[INFO] loading model...");
+      println!("Loading model...");
       let net_res = opencv::dnn::read_net_from_caffe(prototxt, model);
 
       let mut net = opencv::dnn::Net::default().unwrap();
@@ -142,7 +142,6 @@ impl FaceCapture {
                Err(e) => println!("Failed to set_input {:?}", e),
             }
 
-            //expected detection shape (1, 1, *some val*, 7)
             let mut detections = opencv::types::VectorOfMat::new();
 
             let output_name = String::from("detection_out");
@@ -156,18 +155,31 @@ impl FaceCapture {
                Err(e) => println!("Failed to  forward_result {:?}", e),
             }
 
-            for detection in detections {
-               let confidence_index: [i32; 4] = [0, 0, 0, 2];
+            let detection_res = detections.get(0);
+            let num_detections = |detection_res: &Result<opencv::core::Mat, opencv::Error>| -> i32 {
+
+               match detection_res {
+                  Ok(t) => return t.mat_size()[2], 
+                  Err(e) => println!("Some error occured: {:?}", e),
+               }
+
+               return -1
+            }(&detection_res);
+
+            let detection = detection_res.unwrap();
+
+            for i in 0..num_detections {
+               let confidence_index: [i32; 4] = [0, 0, i, 2];
                let confidence = detection.at_nd::<f32>(&confidence_index);
                
                if *confidence.unwrap() < min_confidence {
                   continue;
                }
 
-               let start_x_index: [i32; 4] = [0, 0, 0, 3];
-               let start_y_index: [i32; 4] = [0, 0, 0, 4];
-               let end_x_index: [i32; 4] = [0, 0, 0, 5];
-               let end_y_index: [i32; 4] = [0, 0, 0, 6];
+               let start_x_index: [i32; 4] = [0, 0, i, 3];
+               let start_y_index: [i32; 4] = [0, 0, i, 4];
+               let end_x_index: [i32; 4] = [0, 0, i, 5];
+               let end_y_index: [i32; 4] = [0, 0, i, 6];
                
                let raw_start_x = detection.at_nd::<f32>(&start_x_index).unwrap();
                let raw_start_y = detection.at_nd::<f32>(&start_y_index).unwrap();
