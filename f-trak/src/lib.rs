@@ -5,10 +5,9 @@ pub struct FaceCapture {
 }
 
 impl FaceCapture {
-   pub fn begin_capture() {
-      //Todo: allow users to configure their own model architecture and weights
-      let protopath = Path::new("D:/Portfolio/f-trak/f-trak/static/deploy.prototxt.txt");
-      let modelpath = Path::new("D:/Portfolio/f-trak/f-trak/static/model.caffemodel");
+   pub fn begin_capture(prototxt_filepath : &str, model_filepath : &str) {
+      let protopath = Path::new(prototxt_filepath);
+      let modelpath = Path::new(model_filepath);
 
       let mut file_exists = protopath.exists();
 
@@ -24,13 +23,10 @@ impl FaceCapture {
          false => println!("Failed to find model file"),
       }
 
-      let prototxt = protopath.to_str().unwrap();
-      let model = modelpath.to_str().unwrap();
-
       //ToDo: allow users to configure min confidence
       let min_confidence = 0.9;
 
-      let net_res = opencv::dnn::read_net_from_caffe(prototxt, model);
+      let net_res = opencv::dnn::read_net_from_caffe(prototxt_filepath, model_filepath);
       let mut net = opencv::dnn::Net::default().unwrap();
       
       match net_res {
