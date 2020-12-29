@@ -39,7 +39,7 @@ impl FaceCapture {
       let win_created = opencv::highgui::named_window(window_name, 1 /*opencv::highgui::WindowFlags::WINDOW_AUTOSIZE*/);
 
       match win_created {
-         Ok(v) => println!("Successfully set up camera!{:?}", v),
+         Ok(v) => println!("DEBUG: Successfully set up camera!{:?}", v),
          Err(e) => println!("Failed to create window: {:?}", e),
       }
 
@@ -124,7 +124,7 @@ impl FaceCapture {
                let end_x = raw_end_x * frame_size.width as f32;
                let end_y = raw_end_y * frame_size.height as f32;
 
-               println!("After mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
+               println!("DEBUG: Box Coords ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
 
                let y = |starting_y: f32| -> f32 {
                   if starting_y - 10.0 > 10.0 {
@@ -164,7 +164,11 @@ impl FaceCapture {
          let key = opencv::highgui::wait_key(1).unwrap();
 
          if key%256 == 27 {
-            println!("Escape hit, closing...");
+            println!("DEBUG: Escape hit, closing...");
+            match camera.release() {
+               Ok(_) => {},
+               Err(e) => println!("Failed to release video device: {:?}", e), 
+            }
             break;
          }
       }
