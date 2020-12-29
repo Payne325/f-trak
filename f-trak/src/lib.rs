@@ -16,37 +16,37 @@ impl FaceCapture {
       }
    }
 
-   fn resize(frame: Mat, width: i32) -> Result<Mat, &'static str> {
+   // fn resize(frame: Mat, width: i32) -> Result<Mat, &'static str> {
 
-      if width < 0 {
-         return Err("F")
-      }
+   //    if width < 0 {
+   //       return Err("F")
+   //    }
       
-      let frame_size = frame.size().unwrap();
-      let h = frame_size.height as f64;
-      let w = frame_size.width as f64;
+   //    let frame_size = frame.size().unwrap();
+   //    let h = frame_size.height as f64;
+   //    let w = frame_size.width as f64;
 
-      let r = width as f64 / w;
-      let dim = opencv::core::Size::new(width, (h * r) as i32);
+   //    let r = width as f64 / w;
+   //    let dim = opencv::core::Size::new(width, (h * r) as i32);
       
-      let mut resized_frame = Mat::default().unwrap();
+   //    let mut resized_frame = Mat::default().unwrap();
 
-      let scale_factor = 1.0;
-      let resize_result = opencv::imgproc::resize(&frame, 
-                                                  &mut resized_frame, 
-                                                  dim, 
-                                                  scale_factor, 
-                                                  scale_factor, 
-                                                  3); //opencv::imgproc::InterpolationFlags::INTER_AREA);
+   //    let scale_factor = 1.0;
+   //    let resize_result = opencv::imgproc::resize(&frame, 
+   //                                                &mut resized_frame, 
+   //                                                dim, 
+   //                                                scale_factor, 
+   //                                                scale_factor, 
+   //                                                3); //opencv::imgproc::InterpolationFlags::INTER_AREA);
 
-      match resize_result {
-         Ok(_) => return Ok(frame),
-         Err(e) => {
-            println!("Some error occured: {:?}", e);
-            return Err("Failed to resize image");
-         },
-      }
-   }
+   //    match resize_result {
+   //       Ok(_) => return Ok(frame),
+   //       Err(e) => {
+   //          println!("Some error occured: {:?}", e);
+   //          return Err("Failed to resize image");
+   //       },
+   //    }
+   // }
 
    pub fn begin_capture() {
       //Todo: allow users to configure their own model architecture and weights
@@ -107,7 +107,7 @@ impl FaceCapture {
             let mean = opencv::core::Scalar::new(104.0, 177.0, 123.0, 1.0);
             let scale_factor = 1.0;
 
-            frame = FaceCapture::resize(frame, 400).unwrap();
+            //frame = FaceCapture::resize(frame, 400).unwrap();
 
             //Needed later to draw boxes
             let frame_size = frame.size().unwrap();
@@ -115,9 +115,10 @@ impl FaceCapture {
             let w = frame_size.width;
 
             let mut resized_frame = Mat::default().unwrap();
+            let nn_processing_size = opencv::core::Size::new(300, 300);
             let resize_result = opencv::imgproc::resize(&frame, 
                                                         &mut resized_frame, 
-                                                        opencv::core::Size::new(300, 300), 
+                                                        nn_processing_size, 
                                                         scale_factor, 
                                                         scale_factor, 
                                                         1); //opencv::imgproc::InterpolationFlags::INTER_LINEAR
@@ -129,7 +130,7 @@ impl FaceCapture {
             
             let blob = opencv::dnn::blob_from_image(&mut resized_frame, 
                                                     scale_factor, 
-                                                    opencv::core::Size::new(300, 300), 
+                                                    nn_processing_size, 
                                                     mean, 
                                                     false, 
                                                     false, 
