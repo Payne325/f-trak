@@ -5,7 +5,7 @@ pub struct FaceCapture {
 }
 
 impl FaceCapture {
-   pub fn begin_capture(prototxt_filepath : &str, model_filepath : &str) {
+   pub fn begin_capture(prototxt_filepath : &str, model_filepath : &str, min_confidence : f32) {
       let protopath = Path::new(prototxt_filepath);
       let modelpath = Path::new(model_filepath);
 
@@ -22,9 +22,6 @@ impl FaceCapture {
          true => {},
          false => println!("Failed to find model file"),
       }
-
-      //ToDo: allow users to configure min confidence
-      let min_confidence = 0.9;
 
       let net_res = opencv::dnn::read_net_from_caffe(prototxt_filepath, model_filepath);
       let mut net = opencv::dnn::Net::default().unwrap();
