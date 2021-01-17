@@ -18,15 +18,19 @@ pub struct FaceCapture {
 
 impl FaceCapture {
    pub fn new(bbox_transmitter: mpsc::Sender<FaceBBox>, 
-              termination_transmitter : mpsc::Sender<bool>) -> Self {
+              termination_transmitter : mpsc::Sender<bool>,
+              protopath_str: String,
+              modelpath_str: String,
+              min_confidence: f32) -> Self {
+      
       let bbox : FaceBBox = ((0, 0), (0, 0));
       Self {
          m_bbox: bbox,
          m_bbox_transmitter: bbox_transmitter,
          m_terminate_transmitter: termination_transmitter,
-         m_protopath_str: "D:/Portfolio/f-trak/f-trak/static/deploy.prototxt.txt".to_string(),
-         m_modelpath_str: "D:/Portfolio/f-trak/f-trak/static/model.caffemodel".to_string(),
-         m_min_confidence: 0.9
+         m_protopath_str: protopath_str,
+         m_modelpath_str: modelpath_str,
+         m_min_confidence: min_confidence
       }
    }
 
