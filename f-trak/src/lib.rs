@@ -2,13 +2,6 @@ use opencv::prelude::*;
 use std::path::Path;
 use std::sync::mpsc;
 
-<<<<<<< HEAD
-=======
-pub fn test_func() {
-    println!("Hello, world!");
-}
-
->>>>>>> e12fa99d6cc5f21f0537e111a071325ab86812a8
 type FaceBBox = ((i32, i32), (i32, i32));
 pub struct FaceCapture {
    m_bbox : FaceBBox,
@@ -25,26 +18,6 @@ impl FaceCapture {
               protopath_str: String,
               modelpath_str: String,
               min_confidence: f32) -> Self {
-<<<<<<< HEAD
-=======
-      
-      let bbox : FaceBBox = ((0, 0), (0, 0));
-      Self {
-         m_bbox: bbox,
-         m_bbox_transmitter: bbox_transmitter,
-         m_terminate_transmitter: termination_transmitter,
-         m_protopath_str: protopath_str,
-         m_modelpath_str: modelpath_str,
-         m_min_confidence: min_confidence
-      }
-   }
-
-   fn resize(frame: Mat, width: i32) -> Result<Mat, &'static str> {
-
-      if width < 0 {
-         return Err("F")
-      }
->>>>>>> e12fa99d6cc5f21f0537e111a071325ab86812a8
       
       let bbox : FaceBBox = ((0, 0), (0, 0));
       Self {
@@ -78,10 +51,6 @@ impl FaceCapture {
       let prototxt = protopath.to_str().unwrap();
       let model = modelpath.to_str().unwrap();
 
-<<<<<<< HEAD
-=======
-      println!("[INFO] loading model...");
->>>>>>> e12fa99d6cc5f21f0537e111a071325ab86812a8
       let net_res = opencv::dnn::read_net_from_caffe(prototxt, model);
       let mut net = opencv::dnn::Net::default().unwrap();
       
@@ -183,18 +152,7 @@ impl FaceCapture {
                let end_x = raw_end_x * frame_size.width as f32;
                let end_y = raw_end_y * frame_size.height as f32;
 
-<<<<<<< HEAD
                //println!("DEBUG: Box Coords ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
-=======
-               //println!("Before mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
-
-               start_x *= w as f32;
-               end_x *= w as f32;
-               start_y *= h as f32;
-               end_y *= h as f32;
-
-               //println!("After mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
->>>>>>> e12fa99d6cc5f21f0537e111a071325ab86812a8
 
                let y = |starting_y: f32| -> f32 {
                   if starting_y - 10.0 > 10.0 {
@@ -237,17 +195,12 @@ impl FaceCapture {
          let key = opencv::highgui::wait_key(1).unwrap();
 
          if key%256 == 27 {
-<<<<<<< HEAD
             println!("DEBUG: Escape hit, closing...");
             self.m_terminate_transmitter.send(true).unwrap();
             match camera.release() {
                Ok(_) => {},
                Err(e) => println!("Failed to release video device: {:?}", e), 
             }
-=======
-            println!("Escape hit, closing...");
-            self.m_terminate_transmitter.send(true).unwrap();
->>>>>>> e12fa99d6cc5f21f0537e111a071325ab86812a8
             break;
          }
          else
