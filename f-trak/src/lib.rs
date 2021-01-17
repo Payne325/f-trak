@@ -1,13 +1,34 @@
 use opencv::prelude::*;
 use std::path::Path;
+use std::sync::mpsc;
 
+type FaceBBox = ((i32, i32), (i32, i32));
 pub struct FaceCapture {
+   m_bbox : FaceBBox,
+   m_bbox_transmitter: mpsc::Sender<FaceBBox>,
+   m_terminate_transmitter: mpsc::Sender<bool>,
+   m_protopath_str: String,
+   m_modelpath_str: String,
+   m_min_confidence: f32
 }
 
 impl FaceCapture {
-   pub fn begin_capture(prototxt_filepath : &str, model_filepath : &str, min_confidence : f32) {
-      let protopath = Path::new(prototxt_filepath);
-      let modelpath = Path::new(model_filepath);
+   pub fn new(bbox_transmitter: mpsc::Sender<FaceBBox>, 
+              termination_transmitter : mpsc::Sender<bool>) -> Self {
+      let bbox : FaceBBox = ((0, 0), (0, 0));
+      Self {
+         m_bbox: bbox,
+         m_bbox_transmitter: bbox_transmitter,
+         m_terminate_transmitter: termination_transmitter,
+         m_protopath_str: "D:/Portfolio/f-trak/f-trak/static/deploy.prototxt.txt".to_string(),
+         m_modelpath_str: "D:/Portfolio/f-trak/f-trak/static/model.caffemodel".to_string(),
+         m_min_confidence: 0.9
+      }
+   }
+
+   pub fn begin_capture(&mut self) {
+      let protopath = Path::new(&self.m_protopath_str);
+      let modelpath = Path::new(&self.m_modelpath_str);
 
       let mut file_exists = protopath.exists();
 
@@ -23,7 +44,10 @@ impl FaceCapture {
          false => println!("Failed to find model file"),
       }
 
-      let net_res = opencv::dnn::read_net_from_caffe(prototxt_filepath, model_filepath);
+      let prototxt = protopath.to_str().unwrap();
+      let model = modelpath.to_str().unwrap();
+
+      let net_res = opencv::dnn::read_net_from_caffe(prototxt, model);
       let mut net = opencv::dnn::Net::default().unwrap();
       
       match net_res {
@@ -105,7 +129,7 @@ impl FaceCapture {
                let confidence_index: [i32; 4] = [0, 0, i, 2];
                let confidence = detections.at_nd::<f32>(&confidence_index);
                
-               if *confidence.unwrap() < min_confidence {
+               if *confidence.unwrap() < self.m_min_confidence {
                   continue;
                }
 
@@ -124,7 +148,7 @@ impl FaceCapture {
                let end_x = raw_end_x * frame_size.width as f32;
                let end_y = raw_end_y * frame_size.height as f32;
 
-               println!("DEBUG: Box Coords ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
+               //println!("DEBUG: Box Coords ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
 
                let y = |starting_y: f32| -> f32 {
                   if starting_y - 10.0 > 10.0 {
@@ -138,6 +162,9 @@ impl FaceCapture {
 
                let start_pt = opencv::core::Point2i::new(start_x as i32, y as i32);
                let end_pt = opencv::core::Point2i::new(end_x as i32, end_y as i32);
+               self.m_bbox = ((start_pt.x, start_pt.y), (end_pt.x, end_pt.y));
+               self.m_bbox_transmitter.send(self.m_bbox.clone()).unwrap();
+
                let rect = opencv::core::Rect::from_points(start_pt, end_pt);
 
                let colour_blue = opencv::core::Scalar::new(255.0, 0.0, 0.0, 1.0); //BGR colour 
@@ -165,11 +192,16 @@ impl FaceCapture {
 
          if key%256 == 27 {
             println!("DEBUG: Escape hit, closing...");
+            self.m_terminate_transmitter.send(true).unwrap();
             match camera.release() {
                Ok(_) => {},
                Err(e) => println!("Failed to release video device: {:?}", e), 
             }
             break;
+         }
+         else
+         {
+            self.m_terminate_transmitter.send(false).unwrap();
          }
       }
       ()
