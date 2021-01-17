@@ -1,18 +1,32 @@
 use opencv::prelude::*;
 use std::path::Path;
+use std::sync::mpsc;
 
 pub fn test_func() {
     println!("Hello, world!");
 }
 
+type FaceBBox = ((i32, i32), (i32, i32));
 pub struct FaceCapture {
-   //bbox : ((i32, i32), (i32, i32)),
+   m_bbox : FaceBBox,
+   m_bbox_transmitter: mpsc::Sender<FaceBBox>,
+   m_terminate_transmitter: mpsc::Sender<bool>,
+   m_protopath_str: String,
+   m_modelpath_str: String,
+   m_min_confidence: f32
 }
 
 impl FaceCapture {
-   pub fn new() -> Self {
+   pub fn new(bbox_transmitter: mpsc::Sender<FaceBBox>, 
+              termination_transmitter : mpsc::Sender<bool>) -> Self {
+      let bbox : FaceBBox = ((0, 0), (0, 0));
       Self {
-         //bbox: ((0,0), (0,0))
+         m_bbox: bbox,
+         m_bbox_transmitter: bbox_transmitter,
+         m_terminate_transmitter: termination_transmitter,
+         m_protopath_str: "D:/Portfolio/f-trak/f-trak/static/deploy.prototxt.txt".to_string(),
+         m_modelpath_str: "D:/Portfolio/f-trak/f-trak/static/model.caffemodel".to_string(),
+         m_min_confidence: 0.9
       }
    }
 
@@ -48,10 +62,9 @@ impl FaceCapture {
       }
    }
 
-   pub fn begin_capture() {
-      //Todo: allow users to configure their own model architecture and weights
-      let protopath = Path::new("D:/Portfolio/f-trak/f-trak/static/deploy.prototxt.txt");
-      let modelpath = Path::new("D:/Portfolio/f-trak/f-trak/static/model.caffemodel");
+   pub fn begin_capture(&mut self) {
+      let protopath = Path::new(&self.m_protopath_str);
+      let modelpath = Path::new(&self.m_modelpath_str);
 
       let mut exists = protopath.exists();
 
@@ -70,13 +83,8 @@ impl FaceCapture {
       let prototxt = protopath.to_str().unwrap();
       let model = modelpath.to_str().unwrap();
 
-      //ToDo: allow users to configure min confidence
-      let min_confidence = 0.9;
-
-      //load model from disk
       println!("[INFO] loading model...");
       let net_res = opencv::dnn::read_net_from_caffe(prototxt, model);
-
       let mut net = opencv::dnn::Net::default().unwrap();
       
       match net_res {
@@ -160,7 +168,7 @@ impl FaceCapture {
                let confidence_index: [i32; 4] = [0, 0, 0, 2];
                let confidence = detection.at_nd::<f32>(&confidence_index);
                
-               if *confidence.unwrap() < min_confidence {
+               if *confidence.unwrap() < self.m_min_confidence {
                   continue;
                }
 
@@ -179,14 +187,14 @@ impl FaceCapture {
                let mut end_x = raw_end_x.clone();
                let mut end_y = raw_end_y.clone();
 
-               println!("Before mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
+               //println!("Before mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
 
                start_x *= w as f32;
                end_x *= w as f32;
                start_y *= h as f32;
                end_y *= h as f32;
 
-               println!("After mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
+               //println!("After mult ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
 
                let y = |starting_y: f32| -> f32 {
                   if starting_y - 10.0 > 10.0 {
@@ -200,6 +208,9 @@ impl FaceCapture {
 
                let start_pt = opencv::core::Point2i::new(start_x as i32, y as i32);
                let end_pt = opencv::core::Point2i::new(end_x as i32, end_y as i32);
+               self.m_bbox = ((start_pt.x, start_pt.y), (end_pt.x, end_pt.y));
+               self.m_bbox_transmitter.send(self.m_bbox.clone()).unwrap();
+
                let rect = opencv::core::Rect::from_points(start_pt, end_pt);
 
                let draw_rect_result = opencv::imgproc::rectangle(&mut frame, 
@@ -230,7 +241,12 @@ impl FaceCapture {
 
          if key%256 == 27 {
             println!("Escape hit, closing...");
+            self.m_terminate_transmitter.send(true).unwrap();
             break;
+         }
+         else
+         {
+            self.m_terminate_transmitter.send(false).unwrap();
          }
       }
 
