@@ -1,0 +1,14 @@
+[package]
+name = "f-trak-test"
+version = "0.1.0"
+authors = ["Payne325 <https://github.com/Payne325/f-trak>"]
+edition = "2018"
+license-file = "../LICENSE"
+readme = "../README.md"
+homepage = "https://github.com/Payne325/f-trak"
+repository = "https://github.com/Payne325/f-trak"
+keywords = ["face detection", "vision", "computer vision"]
+description = "f-trak demonstration project."
+
+[dependencies]
+f-trak = { path = "../f-trak/" }
