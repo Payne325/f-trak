@@ -7,7 +7,7 @@ license-file = "../LICENSE"
 readme = "../README.md"
 homepage = "https://github.com/Payne325/f-trak"
 repository = "https://github.com/Payne325/f-trak"
-keywords = ["face detection", "vision", "computer vision"]
+keywords = ["face-detection", "vision", "computer-vision"]
 description = "A neural network based face detection program that tracks face movement in screen space."
 
 [dependencies]

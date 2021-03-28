@@ -152,8 +152,6 @@ impl FaceCapture {
                let end_x = raw_end_x * frame_size.width as f32;
                let end_y = raw_end_y * frame_size.height as f32;
 
-               //println!("DEBUG: Box Coords ({:?}, {:?}), ({:?}, {:?})", start_x, start_y, end_x, end_y);
-
                let y = |starting_y: f32| -> f32 {
                   if starting_y - 10.0 > 10.0 {
                      return starting_y - 10.0;
