@@ -1,5 +1,6 @@
 # f-trak
 A neural network based face detection program that tracks face movement in screen space.
+
 __Please consider this program as in an experimental/alpha stage of development.__
 
 ## Motivation
