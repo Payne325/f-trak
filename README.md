@@ -15,6 +15,7 @@ Perhaps a better face detector could be built, but for the original requirement 
 
 ## Set up
 f-trak is entirely dependent on the [`opencv-rust`](https://github.com/twistedfall/opencv-rust) crate. Please follow the set up procedure in their documentation.
+I've tested f-trak using OpenCV 4.1.2 so I'd recommend using that version, I plan to update the crate in future to support the latest version. Watch this space!
 
 ## How to use
 f-trak is designed to be run on a separate thread and polled for the current location of a detected face. See the f-trak-test directory for an example application.
