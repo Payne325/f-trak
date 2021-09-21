@@ -15,6 +15,22 @@ Perhaps a better face detector could be built, but for the original requirement 
 
 ## Set up
 f-trak is entirely dependent on the [`opencv-rust`](https://github.com/twistedfall/opencv-rust) crate. Please follow the set up procedure in their documentation.
+
+As a summary, when compiling for windows the following environment variables must be set.
+
+`OPENCV_DIR` `"$\opencvLocation\build\x64\vc15\lib"`
+
+`OPENCV_INCLUDE_PATHS` `"$\opencvLocation\build\include"`
+
+`OPENCV_LINK_PATHS` `"$\opencvLocation\build\x64\vc15\lib"`
+
+`OPENCV_LINK_LIBS` `"opencv_world412"`
+
+`Path` `"$\opencvLocation\build\x64\vc15\bin"`
+
+Other environment variables may be needed as the documentation describes.
+You'll also need to install llvm, the [`opencv-rust`](https://github.com/twistedfall/opencv-rust#windows-package) crate readme documentation explains further.
+
 I've tested f-trak using OpenCV 4.1.2 so I'd recommend using that version, I plan to update the crate in future to support the latest version. Watch this space!
 
 ## How to use
