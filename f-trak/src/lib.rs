@@ -72,13 +72,13 @@ impl FaceCapture {
       }
 
       loop {
-         let mut frame = Mat::default().unwrap();
+         let mut frame = Mat::default();
          let success = camera.read(&mut frame);
 
          if success.unwrap() {       
             let scale_factor = 1.0;
             let frame_size = frame.size().unwrap(); //Needed later to draw debug boxes
-            let mut resized_frame = Mat::default().unwrap();
+            let mut resized_frame = Mat::default();
             let nn_processing_size = opencv::core::Size::new(300, 300);
             let resize_result = opencv::imgproc::resize(&frame, 
                                                         &mut resized_frame, 

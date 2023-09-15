@@ -1,6 +1,6 @@
 [package]
 name = "f-trak"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Payne325 <https://github.com/Payne325>"]
 edition = "2018"
 license-file = "../LICENSE"
@@ -11,4 +11,4 @@ keywords = ["face-detection", "vision", "computer-vision"]
 description = "A neural network based face detection program that tracks face movement in screen space."
 
 [dependencies]
-opencv = {version = "0.46.3", default-features = false, features = ["opencv-4", "buildtime-bindgen"]}
+opencv = { version = "0.83.0" }
