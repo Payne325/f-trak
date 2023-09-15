@@ -2,7 +2,7 @@
 name = "f-trak"
 version = "0.2.0"
 authors = ["Payne325 <https://github.com/Payne325>"]
-edition = "2018"
+edition = "2021"
 license-file = "../LICENSE"
 readme = "../README.md"
 homepage = "https://github.com/Payne325/f-trak"
