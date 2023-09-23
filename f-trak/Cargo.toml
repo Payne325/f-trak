@@ -11,4 +11,4 @@ keywords = ["face-detection", "vision", "computer-vision"]
 description = "A neural network based face detection program that tracks face movement in screen space."
 
 [dependencies]
-opencv = { version = "0.83.0" }
+opencv = { version = "0.83.0", default-features = false, features = ["dnn", "highgui", "imgproc", "videoio"] }
