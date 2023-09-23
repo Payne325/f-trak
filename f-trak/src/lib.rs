@@ -129,7 +129,7 @@ impl FaceCapture {
                     let end_x_index: [i32; 4] = [0, 0, detection_index, 5];
                     let end_y_index: [i32; 4] = [0, 0, detection_index, 6];
 
-		    // values are held as f32s, trying to get as any other more useful type will cause a panic.
+		            // values are held as f32s, trying to get as any other more useful type will cause a panic.
                     let raw_start_x = detections.at_nd::<f32>(&start_x_index).unwrap();
                     let raw_start_y = detections.at_nd::<f32>(&start_y_index).unwrap();
                     let raw_end_x = detections.at_nd::<f32>(&end_x_index).unwrap();
@@ -140,15 +140,6 @@ impl FaceCapture {
                     let end_x = raw_end_x * frame_size.width as f32;
                     let end_y = raw_end_y * frame_size.height as f32;
 
-                    // I used to know why this was required... Made this
-                    // constant look super dirty to encourage me to revisit
-                    // this.
-                    const MAGIC_Y_OFFSET: f32 = 10.0;
-                    let start_y = if (start_y - MAGIC_Y_OFFSET) > MAGIC_Y_OFFSET {
-                        start_y - MAGIC_Y_OFFSET
-                    } else {
-                        start_y + MAGIC_Y_OFFSET
-                    };
 
                     let start_pt = opencv::core::Point2i::new(start_x as i32, start_y as i32);
                     let end_pt = opencv::core::Point2i::new(end_x as i32, end_y as i32);

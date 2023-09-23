@@ -26,25 +26,17 @@ fn main() {
     });
 
     loop {
-        let val = bbox_receiver.try_recv();
+        let bbox_res = bbox_receiver.try_recv();
 
-        match val {
-            Ok(t) => println!("BBOX: (({}, {}), ({}, {}))", t.0 .0, t.0 .1, t.1 .0, t.1 .1),
-            Err(_e) => {
-                println!("ERROR: {}", e);
-            }
+        if let Ok(val) = bbox_res {
+            println!("BBOX: (({}, {}), ({}, {}))", val.0 .0, val.0 .1, val.1 .0, val.1 .1);
         }
 
-        let cancel = terminate_receiver.try_recv();
+        let terminate_res = terminate_receiver.try_recv();
 
-        match cancel {
-            Ok(terminate_flag) => {
-                if terminate_flag {
-                    break;
-                }
-            }
-            Err(_e) => {
-                println!("ERROR: {}", e);
+        if let Ok(terminate) = terminate_res {
+            if terminate {
+                break;
             }
         }
     }
